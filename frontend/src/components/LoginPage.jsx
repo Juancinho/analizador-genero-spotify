@@ -7,9 +7,9 @@ function LoginPage({ onLogin, error }) {
       <div className="login-card">
         <div className="login-header">
           <Music size={60} className="logo-icon" />
-          <h1>Spotify Gender Analyzer</h1>
+          <h1>Spotify Analizador de Género</h1>
           <p className="subtitle">
-            Descubre el género de tus artistas favoritos
+            ¿Eres un misógino y no lo sabías? Veamos si escuchas a alguna mujer 
           </p>
         </div>
 
