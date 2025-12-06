@@ -1,11 +1,17 @@
 import { useState, useMemo } from 'react'
-import { LogOut, Filter, Music2, Users, TrendingUp } from 'lucide-react'
+import { LogOut, Filter, Music2, Users, TrendingUp, Calendar } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import ArtistCard from './ArtistCard'
 import './Dashboard.css'
 
-function Dashboard({ artists, onLogout }) {
+function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
   const [filter, setFilter] = useState('all') // all, male, female, unknown
+
+  const timeRangeLabels = {
+    'short_term': 'Últimas 4 semanas',
+    'medium_term': 'Últimos 6 meses',
+    'long_term': 'Último año'
+  }
 
   // Calcular estadísticas
   const stats = useMemo(() => {
@@ -71,13 +77,43 @@ function Dashboard({ artists, onLogout }) {
             <Music2 size={32} className="header-icon" />
             <div>
               <h1>Tu Análisis de Género</h1>
-              <p>Top 50 artistas más escuchados (último mes)</p>
+              <p className="subtitle">
+                <Calendar size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
+                Top 50 artistas · {timeRangeLabels[timeRange]}
+              </p>
             </div>
           </div>
-          <button onClick={onLogout} className="logout-btn">
-            <LogOut size={20} />
-            Cerrar sesión
-          </button>
+          
+          <div className="header-controls">
+            <div className="time-range-selector">
+              <button 
+                className={timeRange === 'short_term' ? 'active' : ''}
+                onClick={() => onTimeRangeChange('short_term')}
+                title="Últimas 4 semanas"
+              >
+                4 Semanas
+              </button>
+              <button 
+                className={timeRange === 'medium_term' ? 'active' : ''}
+                onClick={() => onTimeRangeChange('medium_term')}
+                title="Últimos 6 meses"
+              >
+                6 Meses
+              </button>
+              <button 
+                className={timeRange === 'long_term' ? 'active' : ''}
+                onClick={() => onTimeRangeChange('long_term')}
+                title="Último año"
+              >
+                1 Año
+              </button>
+            </div>
+
+            <button onClick={onLogout} className="logout-btn">
+              <LogOut size={20} />
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       </header>
 

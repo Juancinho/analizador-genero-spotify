@@ -46,6 +46,45 @@
   font-weight: 500;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+}
+
+.time-range-selector {
+  display: flex;
+  gap: 15px;
+  margin-right: 30px;
+}
+
+.time-range-selector button {
+  padding: 8px 16px;
+  background: var(--bg-primary);
+  border: none;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-raised);
+  white-space: nowrap;
+}
+
+.time-range-selector button:hover {
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 
+    5px 5px 10px var(--shadow-dark),
+    -5px -5px 10px var(--shadow-light);
+}
+
+.time-range-selector button.active {
+  color: var(--accent-green);
+  box-shadow: var(--shadow-inset);
+  transform: scale(0.96);
+}
+
 .logout-btn {
   display: flex;
   align-items: center;
@@ -312,6 +351,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 30px;
+  align-items: stretch; /* Stretch cards to fill row height */
 }
 
 .no-artists {
@@ -342,10 +382,26 @@
     padding: 20px;
   }
 
-  /* ... rest of existing 768px styles ... */
-
   .header-left {
     width: 100%;
+  }
+
+  .header-controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .time-range-selector {
+    width: 100%;
+    margin-right: 0;
+    justify-content: space-between;
+  }
+
+  .time-range-selector button {
+    flex: 1;
+    text-align: center;
   }
 
   .logout-btn {

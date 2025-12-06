@@ -293,12 +293,16 @@ async def callback(code: str = None, error: str = None):
         return RedirectResponse(url=f"{FRONTEND_URL}?error=auth_failed")
 
 @app.get("/top-artists-gender")
-async def get_top_artists_gender(session_id: str):
+async def get_top_artists_gender(session_id: str, time_range: str = "short_term"):
     """
-    Obtiene los top 50 artistas del usuario y detecta su género
+    Obtiene los top 50 artistas del usuario y detecta su género.
+    time_range: 'short_term' (4 semanas), 'medium_term' (6 meses), 'long_term' (años)
     """
     if session_id not in token_storage:
         raise HTTPException(status_code=401, detail="Invalid session")
+
+    if time_range not in ["short_term", "medium_term", "long_term"]:
+        time_range = "short_term"
 
     try:
         token_info = token_storage[session_id]
@@ -306,10 +310,10 @@ async def get_top_artists_gender(session_id: str):
         # Crear cliente de Spotify
         sp = spotipy.Spotify(auth=token_info["access_token"])
 
-        # Obtener top 50 artistas (short_term)
-        results = sp.current_user_top_artists(limit=50, time_range='short_term')
+        # Obtener top 50 artistas
+        results = sp.current_user_top_artists(limit=50, time_range=time_range)
 
-        print(f"\n🎵 Procesando {len(results['items'])} artistas en paralelo...")
+        print(f"\n🎵 Procesando {len(results['items'])} artistas en paralelo ({time_range})...")
 
         # Función auxiliar para procesar un artista
         def process_artist(artist):
@@ -333,19 +337,16 @@ async def get_top_artists_gender(session_id: str):
 
         with ThreadPoolExecutor(max_workers=5) as executor:
             # Enviar todos los artistas a procesar en paralelo
-            future_to_artist = {
-                executor.submit(process_artist, artist): artist
-                for artist in results["items"]
-            }
+            # Guardamos los futures en orden para mantener el ranking original
+            futures = [executor.submit(process_artist, artist) for artist in results["items"]]
 
-            # Recoger resultados a medida que se completan
-            for future in as_completed(future_to_artist):
+            # Recoger resultados en orden
+            for future in futures:
                 try:
                     artist_data = future.result()
                     artists_with_gender.append(artist_data)
                 except Exception as e:
-                    artist = future_to_artist[future]
-                    print(f"❌ Error procesando {artist['name']}: {str(e)}")
+                    print(f"❌ Error procesando artista: {str(e)}")
 
         # Guardar dataset al final
         save_gender_dataset()

@@ -9,9 +9,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function App() {
   const [sessionId, setSessionId] = useState(null)
-  const [artists, setArtists] = useState([])
+  const [artistsCache, setArtistsCache] = useState({
+    short_term: null,
+    medium_term: null,
+    long_term: null
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [timeRange, setTimeRange] = useState('short_term')
 
   useEffect(() => {
     // Verificar si hay un session_id en la URL (después del callback)
@@ -29,10 +34,12 @@ function App() {
       setSessionId(sessionIdFromUrl)
       // Limpiar la URL
       window.history.replaceState({}, '', '/')
-      // Cargar artistas
-      loadArtists(sessionIdFromUrl)
+      // Cargar artistas iniciales (short_term)
+      loadArtists(sessionIdFromUrl, 'short_term')
     }
   }, [])
+
+  // Efecto para cargar en segundo plano eliminado a petición del usuario
 
   const handleLogin = async () => {
     try {
@@ -46,29 +53,57 @@ function App() {
     }
   }
 
-  const loadArtists = async (session) => {
+  const loadArtists = async (session, range) => {
+    // Si ya tenemos datos en caché, no hacemos nada
+    if (artistsCache[range]) {
+      console.log(`[Cache] Using cached data for ${range}`)
+      return
+    }
+
+    console.log(`[API] Fetching data for ${range}...`)
     setLoading(true)
     setError(null)
 
     try {
       const response = await axios.get(`${API_URL}/top-artists-gender`, {
-        params: { session_id: session }
+        params: { 
+          session_id: session,
+          time_range: range
+        }
       })
 
-      setArtists(response.data.artists)
+      console.log(`[API] Success: ${response.data.artists.length} artists loaded for ${range}`)
+      
+      setArtistsCache(prev => ({
+        ...prev,
+        [range]: response.data.artists
+      }))
+
     } catch (err) {
-      console.error('Error al cargar artistas:', err)
+      console.error(`Error al cargar artistas (${range}):`, err)
       setError('Error al cargar tus artistas. Por favor, intenta de nuevo.')
-      setSessionId(null)
     } finally {
       setLoading(false)
     }
   }
 
+  const handleTimeRangeChange = (newRange) => {
+    setTimeRange(newRange)
+    // Si no está en caché, cargamos. Si está, el cambio de estado timeRange actualizará la vista instantáneamente
+    if (!artistsCache[newRange]) {
+      loadArtists(sessionId, newRange)
+    }
+  }
+
   const handleLogout = () => {
     setSessionId(null)
-    setArtists([])
+    setArtistsCache({
+      short_term: null,
+      medium_term: null,
+      long_term: null
+    })
     setError(null)
+    setTimeRange('short_term')
   }
 
   if (loading) {
@@ -84,7 +119,18 @@ function App() {
     return <LoginPage onLogin={handleLogin} error={error} />
   }
 
-  return <Dashboard artists={artists} onLogout={handleLogout} />
+  // Obtenemos los artistas del caché según el rango seleccionado
+  // Si aún no están cargados (background fetch en proceso), mostramos array vacío o loading local
+  const currentArtists = artistsCache[timeRange] || []
+
+  return (
+    <Dashboard 
+      artists={currentArtists} 
+      onLogout={handleLogout}
+      timeRange={timeRange}
+      onTimeRangeChange={handleTimeRangeChange}
+    />
+  )
 }
 
 export default App
