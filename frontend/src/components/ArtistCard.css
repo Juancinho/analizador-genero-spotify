@@ -163,24 +163,69 @@
 @media (max-width: 768px) {
   .artist-card {
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
+    min-height: 100px;
   }
   
   .artist-image-container {
-    width: 120px;
+    width: 100px;
+    height: 100px;
     margin: 10px;
     aspect-ratio: 1;
     flex-shrink: 0;
+    border-radius: 15px; /* Slightly smaller radius for smaller image */
   }
 
   .artist-info {
-    padding: 15px;
+    padding: 15px 15px 15px 5px; /* Reduced left padding since image has margin */
+    justify-content: center;
   }
   
   .artist-rank {
-    top: 10px;
-    left: 10px;
+    top: 8px;
+    left: 8px;
     padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .artist-name {
+    font-size: 16px;
+    margin-bottom: 8px;
+    white-space: normal; /* Allow wrapping on mobile if needed */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .artist-gender {
+    padding: 6px 12px;
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .spotify-link {
+    margin-top: 10px;
+    padding: 8px 16px;
     font-size: 12px;
+    align-self: flex-start;
+  }
+  
+  .artist-genres {
+    display: none; /* Hide genres on mobile list view to save space if needed, or keep them limited */
+  }
+}
+
+@media (max-width: 480px) {
+  .artist-image-container {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .artist-info {
+    padding: 10px;
+  }
+
+  .artist-name {
+    font-size: 15px;
   }
 }

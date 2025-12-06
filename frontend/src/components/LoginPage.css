@@ -220,13 +220,18 @@
 
   .features {
     gap: 15px;
+    grid-template-columns: 1fr; /* Stack features vertically on mobile */
   }
 
   .feature {
     padding: 12px;
+    flex-direction: row; /* Row layout for stacked items usually looks better */
+    justify-content: flex-start;
+    text-align: left;
+    gap: 20px;
   }
 
   .feature span:last-child {
-    font-size: 12px;
+    font-size: 13px;
   }
 }
