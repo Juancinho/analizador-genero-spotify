@@ -186,12 +186,22 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
 
           {/* Gráfico circular */}
           {chartData.length > 0 && (
-            <div className="chart-container">
+            <div className="chart-section">
               <h3>Distribución por Género</h3>
-              <div className="chart-wrapper">
+              
+              <div className="chart-area">
+                {/* Centro Neumórfico Flotante */}
+                <div className="chart-inner-hub">
+                  <span className="hub-number">{stats.total}</span>
+                  <span className="hub-label">Artistas</span>
+                </div>
+
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <defs>
+                      <filter id="neumorphic-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feDropShadow dx="2" dy="3" stdDeviation="3" floodColor="rgba(0,0,0,0.15)" />
+                      </filter>
                       <linearGradient id="maleGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#60A5FA" stopOpacity={1}/>
                         <stop offset="100%" stopColor="#3B82F6" stopOpacity={1}/>
@@ -205,66 +215,83 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                         <stop offset="100%" stopColor="#6B7280" stopOpacity={1}/>
                       </linearGradient>
                     </defs>
+
+                    {/* Anillo de fondo (Track / Surco Circular) */}
+                    <Pie
+                      data={[{ value: 1 }]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="60%"
+                      outerRadius="85%"
+                      dataKey="value"
+                      stroke="none"
+                      fill="var(--bg-primary)" 
+                    />
+
+                    {/* Datos reales */}
                     <Pie
                       data={chartData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={renderCustomLabel}
-                      outerRadius="90%"
-                      innerRadius="40%"
+                      outerRadius="85%"
+                      innerRadius="60%"
                       dataKey="value"
                       animationBegin={0}
-                      animationDuration={800}
+                      animationDuration={1000}
                       animationEasing="ease-out"
-                      paddingAngle={4}
-                      stroke="none" 
+                      paddingAngle={6}
+                      stroke="none"
+                      cornerRadius={10}
+                      filter="url(#neumorphic-shadow)"
                     >
                       {chartData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={entry.gradient}
-                          stroke="#e0e5ec"
-                          strokeWidth={4}
+                          stroke="none"
                         />
                       ))}
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        backdropFilter: 'blur(5px)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        backdropFilter: 'blur(8px)',
                         border: 'none',
                         borderRadius: '15px',
                         color: '#4a5568',
-                        boxShadow: '5px 5px 10px rgba(163,177,198,0.4)'
+                        boxShadow: '5px 5px 15px rgba(0,0,0,0.1)'
                       }}
-                      itemStyle={{ color: '#4a5568' }}
+                      itemStyle={{ color: '#4a5568', fontWeight: '600' }}
                       cursor={false}
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={36}
-                      iconType="circle"
-                      iconSize={10}
-                      wrapperStyle={{
-                        paddingTop: '20px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '20px'
-                      }}
-                      formatter={(value, entry) => (
-                        <span style={{ 
-                          color: '#718096', 
-                          fontSize: '14px', 
-                          fontWeight: '600',
-                          marginLeft: '4px'
-                        }}>
-                          {value} <span style={{ opacity: 0.7, fontSize: '12px' }}>({entry.payload.value})</span>
-                        </span>
-                      )}
                     />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* Leyenda Personalizada Estática */}
+              <div className="custom-legend">
+                <div className="legend-item">
+                  <span className="legend-dot male"></span>
+                  <div className="legend-text">
+                    <span className="legend-label">Masculino</span>
+                    <span className="legend-value">{stats.male} ({stats.malePercentage}%)</span>
+                  </div>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-dot female"></span>
+                  <div className="legend-text">
+                    <span className="legend-label">Femenino</span>
+                    <span className="legend-value">{stats.female} ({stats.femalePercentage}%)</span>
+                  </div>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-dot unknown"></span>
+                  <div className="legend-text">
+                    <span className="legend-label">Desconocido</span>
+                    <span className="legend-value">{stats.unknown} ({stats.unknownPercentage}%)</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}
