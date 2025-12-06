@@ -1,284 +1,125 @@
-# Spotify Gender Analyzer
+# 🎵 Analizador de género en Spotify
 
-Una aplicación web que analiza el género de tus artistas favoritos de Spotify utilizando OAuth, MusicBrainz y análisis de género basado en nombres.
+<div align="center">
 
-## Características
+</div>
 
-- Autenticación con Spotify OAuth
-- Análisis de Top 50 artistas (último mes)
-- Detección de género usando MusicBrainz y gender-guesser
-- Visualización moderna y responsiva con React + Vite
-- Estadísticas y gráficos interactivos
-- Filtros por género
-- Listo para desplegar en Vercel
+**Descubre el equilibrio de género en tu música favorita con estilo.**
 
-## Estructura del Proyecto
+Esta aplicación web analiza tus artistas más escuchados en Spotify y visualiza la distribución de género (Masculino, Femenino, Desconocido) utilizando un diseño moderno.
 
-```
-spoti_genero_artista/
-├── backend/               # API Python (FastAPI)
-│   ├── main.py           # Aplicación principal
-│   ├── requirements.txt  # Dependencias Python
-│   ├── vercel.json      # Configuración Vercel
-│   └── .env.example     # Variables de entorno
-└── frontend/             # Aplicación React
-    ├── src/
-    │   ├── components/  # Componentes React
-    │   ├── App.jsx      # Componente principal
-    │   └── main.jsx     # Punto de entrada
-    ├── package.json     # Dependencias Node
-    ├── vite.config.js   # Configuración Vite
-    ├── vercel.json      # Configuración Vercel
-    └── .env.example     # Variables de entorno
-```
+![Dashboard Preview](https://via.placeholder.com/800x400/e0e5ec/3b82f6?text=Vista+Previa+del+Dashboard)
 
-## Instalación Local
+---
 
-### Requisitos Previos
+## ✨ Características Principales
 
-- Node.js 18+ y npm/yarn
-- Python 3.9+
-- Cuenta de Spotify Developer
+* **🎨 Diseño Neumórfico:** Una interfaz limpia y suave ("Soft UI") con sombras realistas, botones elevados y gráficos integrados en la superficie.
+* **⏱️ Múltiples Rangos de Tiempo:**
+  * **Corto Plazo:** Últimas 4 semanas (Top 50).
+  * **Medio Plazo:** Últimos 6 meses (Top 30).
+  * **Largo Plazo:** Último año (Top 30).
+* **🧠 Detección Inteligente de Género:**
+  1. **Dataset Local:** Carga instantánea para artistas ya conocidos.
+  2. **MusicBrainz API:** Consulta detallada de metadatos (solistas y bandas).
+  3. **Análisis de Miembros:** Si es una banda, analiza el género de sus integrantes.
+  4. **Gender Guesser:** Inferencia basada en el nombre de pila como último recurso.
+* **💬 Mensajes "Sassy":** El sistema te juzgará (con humor) basándose en tu porcentaje de artistas femeninas. ¡Desde "Campo de nabos" hasta "Territorio de Reinas"!
 
-### 1. Configurar Credenciales de Spotify
+---
 
-1. Ve a [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Crea una nueva aplicación
-3. Anota tu **Client ID** y **Client Secret**
-4. En "Edit Settings", agrega las siguientes Redirect URIs:
-   - `http://localhost:8000/callback` (desarrollo)
-   - `https://tu-backend.vercel.app/callback` (producción)
+## 🚀 Tecnologías
 
-### 2. Backend
+### Frontend
+
+* **React + Vite:** Velocidad y modularidad.
+* **Recharts:** Gráficos SVG personalizados con filtros y gradientes.
+* **Lucide React:** Iconografía moderna.
+* **CSS3 Variables:** Sistema de temas y sombras complejo para el efecto Neumorphic.
+
+### Backend
+
+* **FastAPI:** API Python de alto rendimiento.
+* **Spotipy:** Cliente ligero para la API de Spotify.
+* **MusicBrainzNGS:** Conexión con la enciclopedia musical abierta.
+* **Concurrent Futures:** Procesamiento paralelo para analizar 50 artistas simultáneamente sin bloquear.
+
+---
+
+## 🛠️ Instalación y Configuración
+
+### Prerrequisitos
+
+1. Tener **Python 3.9+** y **Node.js 16+** instalados.
+2. Crear una aplicación en el [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
+3. Obtener `Client ID` y `Client Secret`.
+4. Añadir `http://localhost:8000/callback` como **Redirect URI** en la app de Spotify.
+
+### 1. Configurar el Backend
 
 ```bash
 cd backend
 
 # Crear entorno virtual (opcional pero recomendado)
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+# En Windows:
+.\venv\Scripts\activate
+# En Mac/Linux:
+source venv/bin/activate
 
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Configurar variables de entorno
+# Crear archivo .env
 cp .env.example .env
-# Edita .env y agrega tus credenciales de Spotify
 ```
 
-Contenido del archivo `.env`:
+Edita el archivo `.env` en `backend/` con tus credenciales:
 
 ```env
-SPOTIFY_CLIENT_ID=tu_client_id
-SPOTIFY_CLIENT_SECRET=tu_client_secret
-SPOTIFY_REDIRECT_URI=http://localhost:8000/callback
-FRONTEND_URL=http://localhost:5173
+SPOTIFY_CLIENT_ID="tu_client_id"
+SPOTIFY_CLIENT_SECRET="tu_client_secret"
+SPOTIFY_REDIRECT_URI="http://localhost:8000/callback"
+FRONTEND_URL="http://localhost:5173"
 ```
 
-Ejecutar backend:
+Arrancar el servidor:
 
 ```bash
-python main.py
-# O con uvicorn:
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload
 ```
 
-El backend estará disponible en `http://localhost:8000`
-
-### 3. Frontend
+### 2. Configurar el Frontend
 
 ```bash
 cd frontend
 
 # Instalar dependencias
 npm install
-# o con yarn:
-yarn install
 
-# Configurar variables de entorno
-cp .env.example .env
-# Edita .env si es necesario
-```
-
-Contenido del archivo `.env`:
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-Ejecutar frontend:
-
-```bash
+# Arrancar el servidor de desarrollo
 npm run dev
-# o con yarn:
-yarn dev
 ```
 
-El frontend estará disponible en `http://localhost:5173`
+---
 
-## Despliegue en Vercel
+## 🧠 Cómo funciona la detección
 
-### Desplegar Backend
+El sistema utiliza un algoritmo de cascada para determinar el género:
 
-1. **Crear nuevo proyecto en Vercel**
-   - Ve a [Vercel](https://vercel.com)
-   - Haz clic en "Add New Project"
-   - Importa tu repositorio
-   - Selecciona la carpeta `backend` como Root Directory
+1. **Cache/Dataset:** Primero mira si ya conoce al artista (`artists_gender_dataset.json`).
+2. **MusicBrainz Directo:** Busca al artista. Si tiene el campo `gender` (solistas), lo usa.
+3. **Análisis de Bandas:** Si es un grupo, busca la relación "member of band".
+   * Si hay al menos una mujer en la banda -> Se clasifica como **Femenino** (para promover visibilidad).
+   * Si son todos hombres -> **Masculino**.
+4. **Inferencia de Nombre:** Si todo falla, usa `gender-guesser` sobre el primer nombre del artista.
 
-2. **Configurar Variables de Entorno**
+---
 
-   En la sección "Environment Variables" de Vercel, agrega:
+## 📄 Licencia
 
-   ```
-   SPOTIFY_CLIENT_ID=tu_client_id
-   SPOTIFY_CLIENT_SECRET=tu_client_secret
-   SPOTIFY_REDIRECT_URI=https://tu-backend.vercel.app/callback
-   FRONTEND_URL=https://tu-frontend.vercel.app
-   ```
+Este proyecto está bajo la Licencia MIT - siéntete libre de usarlo y modificarlo.
 
-3. **Deploy**
-   - Haz clic en "Deploy"
-   - Anota la URL del backend (ej: `https://tu-backend.vercel.app`)
+---
 
-4. **Actualizar Spotify Redirect URI**
-   - Ve a Spotify Developer Dashboard
-   - Agrega `https://tu-backend.vercel.app/callback` a las Redirect URIs
-
-### Desplegar Frontend
-
-1. **Crear nuevo proyecto en Vercel**
-   - Haz clic en "Add New Project"
-   - Importa tu repositorio
-   - Selecciona la carpeta `frontend` como Root Directory
-
-2. **Configurar Variables de Entorno**
-
-   En la sección "Environment Variables" de Vercel, agrega:
-
-   ```
-   VITE_API_URL=https://tu-backend.vercel.app
-   ```
-
-3. **Configurar Build Settings**
-   - Framework Preset: Vite
-   - Build Command: `npm run build` (debería detectarse automáticamente)
-   - Output Directory: `dist` (debería detectarse automáticamente)
-
-4. **Deploy**
-   - Haz clic en "Deploy"
-   - Anota la URL del frontend (ej: `https://tu-frontend.vercel.app`)
-
-5. **Actualizar Backend**
-   - Actualiza la variable `FRONTEND_URL` en el backend de Vercel con la URL del frontend
-
-### Despliegue Alternativo (Monorepo)
-
-Si prefieres desplegar todo desde un solo repositorio:
-
-1. **Backend**: Crea un proyecto en Vercel apuntando a `/backend`
-2. **Frontend**: Crea otro proyecto en Vercel apuntando a `/frontend`
-
-## Cómo Funciona
-
-### Backend (FastAPI)
-
-1. **OAuth Flow**:
-   - `/login` → Genera URL de autorización de Spotify
-   - `/callback` → Recibe el código OAuth y lo intercambia por token
-   - Almacena el token con un session_id único
-
-2. **Análisis de Género**:
-   - Obtiene top 50 artistas del usuario desde Spotify API
-   - Para cada artista, busca información en MusicBrainz
-   - Si es solista: usa `gender-guesser` con el primer nombre
-   - Si es banda: detecta género de cada miembro, cuenta como femenino si hay al menos una mujer
-   - Devuelve JSON con artistas y su género detectado
-
-3. **API Endpoints**:
-   - `GET /login` - Inicia OAuth
-   - `GET /callback` - Callback OAuth
-   - `GET /top-artists-gender?session_id={id}` - Obtiene artistas con género
-   - `GET /health` - Health check
-
-### Frontend (React + Vite)
-
-1. **LoginPage**: Botón para iniciar sesión con Spotify
-2. **Dashboard**: Muestra artistas con:
-   - Tarjetas visuales con imagen y nombre
-   - Badge de género (masculino/femenino/desconocido)
-   - Estadísticas agregadas
-   - Gráfico de distribución (Recharts)
-   - Filtros por género
-   - Links a Spotify
-
-## Tecnologías Utilizadas
-
-### Backend
-- **FastAPI**: Framework web moderno para Python
-- **Spotipy**: Cliente de Spotify API
-- **MusicBrainz**: Base de datos de música
-- **gender-guesser**: Detector de género por nombre
-
-### Frontend
-- **React 18**: Biblioteca UI
-- **Vite**: Build tool y dev server
-- **Recharts**: Librería de gráficos
-- **Lucide React**: Iconos
-- **Axios**: Cliente HTTP
-
-## Limitaciones y Consideraciones
-
-1. **MusicBrainz Rate Limiting**: La API de MusicBrainz tiene límites de tasa. En caso de muchos artistas, puede tardar.
-
-2. **Detección de Género**:
-   - No es 100% precisa, especialmente para nombres de escenario
-   - Depende de la información disponible en MusicBrainz
-   - Algunos artistas pueden no estar en MusicBrainz
-
-3. **Almacenamiento de Tokens**:
-   - En desarrollo, los tokens se guardan en memoria
-   - En producción, considera usar Redis o una base de datos
-
-4. **CORS**:
-   - Configurado para permitir todos los orígenes en desarrollo
-   - En producción, especifica el dominio del frontend
-
-## Mejoras Futuras
-
-- Cache de resultados de MusicBrainz
-- Base de datos para almacenar tokens y resultados
-- Análisis de más períodos (medium_term, long_term)
-- Exportar resultados a PDF/CSV
-- Comparar con otros usuarios
-- Análisis de playlists
-
-## Troubleshooting
-
-### Error: "Invalid session"
-- El token expiró o el session_id es inválido
-- Cierra sesión y vuelve a iniciar sesión
-
-### Error: "MusicBrainz API error"
-- Posible rate limiting de MusicBrainz
-- Espera unos minutos e intenta de nuevo
-
-### El frontend no se conecta al backend
-- Verifica que `VITE_API_URL` esté configurado correctamente
-- Verifica CORS en el backend
-
-### OAuth redirect no funciona
-- Verifica que la Redirect URI en Spotify coincida exactamente con la configurada
-- Asegúrate de que `SPOTIFY_REDIRECT_URI` en el backend sea correcta
-
-## Licencia
-
-MIT License
-
-## Autor
-
-Creado con Claude Code
-
-## Contribuciones
-
-¡Las contribuciones son bienvenidas! Por favor, abre un issue o pull request.
+Hecho con 🎧 y mucho ☕por Juan Otero

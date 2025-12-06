@@ -1,3 +1,12 @@
+/**
+ * Componente Principal de la Aplicación.
+ * 
+ * Aquí gestionamos el estado global: autenticación y datos de artistas.
+ * Implemento una estrategia de "Waterfall Loading" para mejorar la UX:
+ * 1. Cargamos rápido lo esencial (últimas 4 semanas).
+ * 2. Una vez el usuario ya está interactuando, cargamos en segundo plano 
+ *    los datos históricos (6 meses y 1 año) para que la navegación sea instantánea.
+ */
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import LoginPage from './components/LoginPage'
@@ -9,48 +18,53 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function App() {
   const [sessionId, setSessionId] = useState(null)
+  
+  // Cache local para evitar llamadas innecesarias a la API.
+  // Si ya bajamos "medium_term", no lo volvemos a pedir aunque el usuario cambie de pestaña.
   const [artistsCache, setArtistsCache] = useState({
     short_term: null,
     medium_term: null,
     long_term: null
   })
+  
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [timeRange, setTimeRange] = useState('short_term')
 
   useEffect(() => {
-    // Verificar si hay un session_id en la URL (después del callback)
+    // Lógica de recuperación de sesión post-OAuth.
+    // Buscamos el session_id que nos devuelve el backend en la URL.
     const params = new URLSearchParams(window.location.search)
     const sessionIdFromUrl = params.get('session_id')
     const errorFromUrl = params.get('error')
 
     if (errorFromUrl) {
       setError(`Error de autenticación: ${errorFromUrl}`)
-      window.history.replaceState({}, '', '/')
+      window.history.replaceState({}, '', '/') // Limpiamos URL por seguridad
       return
     }
 
     if (sessionIdFromUrl) {
       setSessionId(sessionIdFromUrl)
-      // Limpiar la URL
       window.history.replaceState({}, '', '/')
-      // Cargar artistas iniciales (short_term)
+      // Carga inicial crítica: Solo lo que el usuario va a ver inmediatamente.
       loadArtists(sessionIdFromUrl, 'short_term')
     }
   }, [])
 
-  // Efecto para cargar en segundo plano el resto de rangos una vez se tiene el primero
+  // Estrategia de carga en segundo plano (Background Fetching)
+  // En cuanto tenemos los datos iniciales, empezamos a traer silenciosamente el resto.
   useEffect(() => {
     if (sessionId && artistsCache.short_term) {
       const fetchBackground = async () => {
-        // Pequeño delay para no saturar inmediatamente después del render
+        // Pequeño delay para no saturar la red/CPU durante el renderizado inicial del Dashboard
         setTimeout(async () => {
           if (!artistsCache.medium_term) {
-            console.log('[Background] Fetching medium_term...')
+            console.log('[Background] Anticipando carga de medium_term...')
             await loadArtists(sessionId, 'medium_term', true)
           }
           if (!artistsCache.long_term) {
-            console.log('[Background] Fetching long_term...')
+            console.log('[Background] Anticipando carga de long_term...')
             await loadArtists(sessionId, 'long_term', true)
           }
         }, 1000)
@@ -62,8 +76,8 @@ function App() {
   const handleLogin = async () => {
     try {
       setError(null)
+      // Iniciamos el flujo OAuth pidiendo la URL al backend
       const response = await axios.get(`${API_URL}/login`)
-      // Redirigir a la URL de autorización de Spotify
       window.location.href = response.data.auth_url
     } catch (err) {
       console.error('Error al iniciar sesión:', err)
@@ -72,14 +86,15 @@ function App() {
   }
 
   const loadArtists = async (session, range, isBackground = false) => {
-    // Si ya tenemos datos en caché, no hacemos nada
+    // Si ya lo tenemos en memoria, ahorramos la petición. Eficiencia pura.
     if (artistsCache[range]) {
-      console.log(`[Cache] Using cached data for ${range}`)
+      console.log(`[Cache] Usando datos cacheados para ${range}`)
       return
     }
 
+    // Si es background, no mostramos spinner para no interrumpir al usuario.
     if (!isBackground) {
-      console.log(`[API] Fetching data for ${range}...`)
+      console.log(`[API] Solicitando datos para ${range}...`)
       setLoading(true)
     }
     
@@ -93,7 +108,7 @@ function App() {
         }
       })
 
-      console.log(`[API] Success: ${response.data.artists.length} artists loaded for ${range}`)
+      console.log(`[API] Éxito: ${response.data.artists.length} artistas recibidos (${range})`)
       
       setArtistsCache(prev => ({
         ...prev,
@@ -112,7 +127,8 @@ function App() {
 
   const handleTimeRangeChange = (newRange) => {
     setTimeRange(newRange)
-    // Si no está en caché, cargamos. Si está, el cambio de estado timeRange actualizará la vista instantáneamente
+    // Fallback: Si el usuario es muy rápido y el background fetch no acabó,
+    // forzamos la carga con loading indicator aquí.
     if (!artistsCache[newRange]) {
       loadArtists(sessionId, newRange)
     }
@@ -142,8 +158,8 @@ function App() {
     return <LoginPage onLogin={handleLogin} error={error} />
   }
 
-  // Obtenemos los artistas del caché según el rango seleccionado
-  // Si aún no están cargados (background fetch en proceso), mostramos array vacío o loading local
+  // Renderizamos el dashboard con los datos del caché actual.
+  // Si no hay datos (ej. fallo raro), pasamos array vacío.
   const currentArtists = artistsCache[timeRange] || []
 
   return (
