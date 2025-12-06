@@ -63,6 +63,7 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
   // Label personalizado para el gráfico
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     const RADIAN = Math.PI / 180
+    // Calcular la posición del label en el centro de la porción
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5
     const x = cx + radius * Math.cos(-midAngle * RADIAN)
     const y = cy + radius * Math.sin(-midAngle * RADIAN)
@@ -71,13 +72,13 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
       <text
         x={x}
         y={y}
-        fill="white"
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
+        fill="white" // Color blanco para contrastar con los colores de las porciones
+        textAnchor="middle" // Centrar horizontalmente
+        dominantBaseline="central" // Centrar verticalmente
         style={{
-          fontSize: '24px',
+          fontSize: '16px', // Tamaño de fuente legible
           fontWeight: 'bold',
-          textShadow: '0px 2px 4px rgba(0,0,0,0.4)'
+          textShadow: '0px 0px 4px rgba(0,0,0,0.6)' // Sombra para mejor legibilidad
         }}
       >
         {`${(percent * 100).toFixed(0)}%`}
@@ -234,6 +235,7 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
+                      label={renderCustomLabel} // Aquí reintroducimos los labels
                       outerRadius="85%"
                       innerRadius="60%"
                       dataKey="value"
@@ -261,7 +263,7 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                         borderRadius: '15px',
                         color: '#4a5568',
                         boxShadow: '5px 5px 15px rgba(0,0,0,0.1)',
-                        zIndex: 9999 // Asegurar que el tooltip esté siempre encima
+                        zIndex: 9999
                       }}
                       itemStyle={{ color: '#4a5568', fontWeight: '600' }}
                       cursor={false}
