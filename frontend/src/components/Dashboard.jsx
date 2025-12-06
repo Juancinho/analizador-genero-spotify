@@ -260,7 +260,8 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                         border: 'none',
                         borderRadius: '15px',
                         color: '#4a5568',
-                        boxShadow: '5px 5px 15px rgba(0,0,0,0.1)'
+                        boxShadow: '5px 5px 15px rgba(0,0,0,0.1)',
+                        zIndex: 9999 // Asegurar que el tooltip esté siempre encima
                       }}
                       itemStyle={{ color: '#4a5568', fontWeight: '600' }}
                       cursor={false}
