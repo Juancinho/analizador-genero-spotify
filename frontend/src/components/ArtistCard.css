@@ -164,12 +164,12 @@
   .artist-card {
     flex-direction: row;
     align-items: center;
-    min-height: 150px; /* Increased height */
+    min-height: 180px; /* Increased height */
   }
   
   .artist-image-container {
-    width: 130px; /* Increased size */
-    height: 130px;
+    width: 150px; /* Increased size */
+    height: 150px;
     margin: 10px;
     aspect-ratio: 1;
     flex-shrink: 0;
@@ -189,7 +189,7 @@
   }
 
   .artist-name {
-    font-size: 17px; /* Slightly larger name */
+    font-size: 17px;
     margin-bottom: 10px;
     white-space: normal;
     display: -webkit-box;
@@ -218,8 +218,8 @@
 
 @media (max-width: 480px) {
   .artist-image-container {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
   }
   
   .artist-info {
