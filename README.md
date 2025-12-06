@@ -1,14 +1,10 @@
 # 🎵 Analizador de género en Spotify
 
-<div align="center">
-
-</div>
-
 **Descubre el equilibrio de género en tu música favorita con estilo.**
 
 Esta aplicación web analiza tus artistas más escuchados en Spotify y visualiza la distribución de género (Masculino, Femenino, Desconocido) utilizando un diseño moderno.
 
-![Dashboard Preview](https://via.placeholder.com/800x400/e0e5ec/3b82f6?text=Vista+Previa+del+Dashboard)
+![Dashboard Preview](https://github.com/Juancinho/analizador-genero-spotify/blob/main/img/dashboard.png)
 
 ---
 
@@ -16,7 +12,7 @@ Esta aplicación web analiza tus artistas más escuchados en Spotify y visualiza
 
 * **🎨 Diseño Neumórfico:** Una interfaz limpia y suave ("Soft UI") con sombras realistas, botones elevados y gráficos integrados en la superficie.
 * **⏱️ Múltiples Rangos de Tiempo:**
-  * **Corto Plazo:** Últimas 4 semanas (Top 50).
+  * **Corto Plazo:** Últimas 4 semanas (Top 30).
   * **Medio Plazo:** Últimos 6 meses (Top 30).
   * **Largo Plazo:** Último año (Top 30).
 * **🧠 Detección Inteligente de Género:**
