@@ -95,7 +95,7 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
               <h1>Tu Análisis de Género</h1>
               <p className="subtitle">
                 <Calendar size={14} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
-                Top 50 artistas · {timeRangeLabels[timeRange]}
+                Top {artists.length} artistas · {timeRangeLabels[timeRange]}
               </p>
             </div>
           </div>

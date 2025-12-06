@@ -115,7 +115,7 @@
   "South Arcade": "female",
   "Mac Miller": "male",
   "The Cult": "male",
-  "Milli Vanilli": "female",
+  "Milli Vanilli": "male",
   "Loyle Carner": "male",
   "Missing Persons": "female",
   "Europe": "male",
@@ -1981,5 +1981,10 @@
   "Cravity": "male",
   "P1Harmony": "male",
   "Tempest": "male",
-  "Xikers": "male"
+  "Xikers": "male",
+  "Luisaker": "male",
+  "Aromas de Feria": "female",
+  "Sons of Aguirre": "male",
+  "TALE$": "male",
+  "Pecos": "male"
 }

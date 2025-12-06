@@ -298,6 +298,9 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
     Obtiene los top 50 artistas del usuario y detecta su género.
     time_range: 'short_term' (4 semanas), 'medium_term' (6 meses), 'long_term' (años)
     """
+    # Recargar dataset por si hubo ediciones manuales en el JSON
+    load_gender_dataset()
+
     if session_id not in token_storage:
         raise HTTPException(status_code=401, detail="Invalid session")
 
@@ -310,8 +313,11 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
         # Crear cliente de Spotify
         sp = spotipy.Spotify(auth=token_info["access_token"])
 
-        # Obtener top 50 artistas
-        results = sp.current_user_top_artists(limit=50, time_range=time_range)
+        # Determinar límite según el rango de tiempo
+        limit = 50 if time_range == "short_term" else 30
+
+        # Obtener top artistas
+        results = sp.current_user_top_artists(limit=limit, time_range=time_range)
 
         print(f"\n🎵 Procesando {len(results['items'])} artistas en paralelo ({time_range})...")
 
