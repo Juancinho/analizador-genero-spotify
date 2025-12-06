@@ -39,7 +39,25 @@ function App() {
     }
   }, [])
 
-  // Efecto para cargar en segundo plano eliminado a petición del usuario
+  // Efecto para cargar en segundo plano el resto de rangos una vez se tiene el primero
+  useEffect(() => {
+    if (sessionId && artistsCache.short_term) {
+      const fetchBackground = async () => {
+        // Pequeño delay para no saturar inmediatamente después del render
+        setTimeout(async () => {
+          if (!artistsCache.medium_term) {
+            console.log('[Background] Fetching medium_term...')
+            await loadArtists(sessionId, 'medium_term', true)
+          }
+          if (!artistsCache.long_term) {
+            console.log('[Background] Fetching long_term...')
+            await loadArtists(sessionId, 'long_term', true)
+          }
+        }, 1000)
+      }
+      fetchBackground()
+    }
+  }, [artistsCache.short_term, sessionId])
 
   const handleLogin = async () => {
     try {
@@ -53,15 +71,18 @@ function App() {
     }
   }
 
-  const loadArtists = async (session, range) => {
+  const loadArtists = async (session, range, isBackground = false) => {
     // Si ya tenemos datos en caché, no hacemos nada
     if (artistsCache[range]) {
       console.log(`[Cache] Using cached data for ${range}`)
       return
     }
 
-    console.log(`[API] Fetching data for ${range}...`)
-    setLoading(true)
+    if (!isBackground) {
+      console.log(`[API] Fetching data for ${range}...`)
+      setLoading(true)
+    }
+    
     setError(null)
 
     try {
@@ -81,9 +102,11 @@ function App() {
 
     } catch (err) {
       console.error(`Error al cargar artistas (${range}):`, err)
-      setError('Error al cargar tus artistas. Por favor, intenta de nuevo.')
+      if (!isBackground) {
+        setError('Error al cargar tus artistas. Por favor, intenta de nuevo.')
+      }
     } finally {
-      setLoading(false)
+      if (!isBackground) setLoading(false)
     }
   }
 

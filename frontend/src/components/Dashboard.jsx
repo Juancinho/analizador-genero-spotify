@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { LogOut, Filter, Music2, Users, TrendingUp, Calendar } from 'lucide-react'
+import { LogOut, Filter, Music2, Users, TrendingUp, Calendar, MessageCircle } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import ArtistCard from './ArtistCard'
 import './Dashboard.css'
@@ -30,6 +30,22 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
       unknownPercentage: total > 0 ? ((unknown / total) * 100).toFixed(1) : 0
     }
   }, [artists])
+
+  // Mensajes graciosos según porcentaje
+  const sassyMessage = useMemo(() => {
+    const pct = parseFloat(stats.femalePercentage)
+    
+    if (pct < 1) return { text: "🚩 ¿Tienes alergia a las mujeres? Literalmente 0%.", type: "bad" }
+    if (pct < 10) return { text: "Madre mía... Tu playlist es un campo de nabos. 🌭", type: "bad" }
+    if (pct < 20) return { text: "Huele a cerrado aquí. Necesitas ventilar tu Spotify con voces femeninas. 💨", type: "bad" }
+    if (pct < 30) return { text: "Flojito, flojito. Hay margen de mejora, eh. 👀", type: "neutral" }
+    if (pct < 40) return { text: "Te acercas a la paridad, pero te falta un empujón. 👉", type: "neutral" }
+    if (pct < 50) return { text: "Ni tan mal. Casi equilibrado. 🤷‍♂️", type: "good" }
+    if (pct < 60) return { text: "¡Equilibrio perfecto! Thanos estaría orgulloso. ⚖️", type: "good" }
+    if (pct < 70) return { text: "El gusto se nota. Buena presencia femenina. 👌", type: "good" }
+    if (pct < 80) return { text: "Tu Spotify es territorio de reinas. 👑", type: "excellent" }
+    return { text: "Devoraste. Puro girl power aquí. 💅", type: "excellent" }
+  }, [stats.femalePercentage])
 
   // Filtrar artistas
   const filteredArtists = useMemo(() => {
@@ -160,6 +176,12 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                 <p className="stat-label">Desconocido ({stats.unknownPercentage}%)</p>
               </div>
             </div>
+          </div>
+
+          {/* Mensaje gracioso */}
+          <div className={`sassy-message-container ${sassyMessage.type}`}>
+            <MessageCircle size={28} className="sassy-icon" />
+            <p>{sassyMessage.text}</p>
           </div>
 
           {/* Gráfico circular */}
