@@ -1,175 +1,186 @@
 .artist-card {
   position: relative;
-  background: #222;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
+  background: var(--bg-primary);
+  border-radius: 25px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
+  box-shadow: var(--shadow-inset); /* Hueco style */
+  border: none; /* Inset usually doesn't have a border, or it's subtle */
+  display: flex;
+  flex-direction: column;
 }
 
 .artist-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-  border-color: #3a3a3a;
+  box-shadow: 
+    inset 2px 2px 5px var(--shadow-dark), 
+    inset -2px -2px 5px var(--shadow-light),
+    0 10px 20px -10px rgba(0,0,0,0.1); /* Slight lift visual combined with deep inset? Or just deeper inset? Let's try a mix: still inset but deeper or lifted? 
+    User said "hueco". A hole doesn't lift. A hole gets deeper. 
+    Let's keep it simple: slightly deeper inset or no transform. 
+    Actually, user might like it if it stays a hole. Let's try adding a glow or just deeper inset. */
+  box-shadow: var(--shadow-inset), inset 0 0 20px rgba(0,0,0,0.05);
 }
 
 .artist-rank {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  color: var(--accent-green);
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 700; /* Reduced from 800 */
   z-index: 10;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .artist-image-container {
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #1a1a1a;
+  background: transparent; /* Transparent because the card itself is the hole */
+  position: relative;
+  margin: 0; /* Full width image in the hole? Or padding? Let's do padding to look like a frame */
+  margin: 15px;
+  width: calc(100% - 30px);
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* The image pops OUT of the hole slightly? Or stays flat? Let's make it pop out slightly to contrast the hole */
+}
+
+.artist-image-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4));
+  pointer-events: none;
 }
 
 .artist-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s ease;
 }
 
 .artist-card:hover .artist-image {
-  transform: scale(1.05);
+  transform: scale(1.15) rotate(2deg);
 }
 
 .artist-info {
-  padding: 20px;
+  padding: 10px 20px 20px 20px;
+  background: transparent;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .artist-name {
   font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
+  font-weight: 600; /* Reduced from 700 */
+  color: var(--text-primary);
   margin-bottom: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.5px;
 }
 
 .artist-gender {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  align-self: flex-start;
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-raised); /* Small pill pops out */
+  transition: all 0.3s ease;
 }
 
-.artist-gender.male {
-  background: #1e3a8a;
-  color: #93c5fd;
-  border: 1px solid #3b82f6;
+.artist-card:hover .artist-gender {
+  box-shadow: var(--shadow-inset);
 }
 
-.artist-gender.female {
-  background: #831843;
-  color: #fda4af;
-  border: 1px solid #ec4899;
-}
-
-.artist-gender.unknown {
-  background: #374151;
-  color: #d1d5db;
-  border: 1px solid #6b7280;
-}
+.artist-gender.male { color: var(--accent-blue); }
+.artist-gender.female { color: var(--accent-pink); }
+.artist-gender.unknown { color: var(--text-secondary); }
 
 .artist-genres {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: auto; /* Push link to bottom */
 }
 
 .genre-tag {
   font-size: 11px;
-  padding: 4px 10px;
-  background: #2a2a2a;
-  color: #b3b3b3;
-  border: 1px solid #3a3a3a;
-  border-radius: 12px;
-  font-weight: 500;
+  padding: 6px 12px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: var(--shadow-inset); /* Inset tags inside inset card? Maybe just flat border? Let's do inset for consistency */
+  border: 1px solid rgba(255,255,255,0.5);
 }
 
 .spotify-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: #1DB954;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-primary);
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
-  transition: color 0.2s;
-  margin-top: 8px;
+  transition: all 0.3s;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 15px;
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-raised); /* Button pops out */
 }
 
 .spotify-link:hover {
-  color: #1ed760;
-  text-decoration: underline;
+  color: var(--accent-green);
+  transform: translateY(-2px);
+  box-shadow: 
+    5px 5px 10px var(--shadow-dark),
+    -5px -5px 10px var(--shadow-light);
+}
+
+.spotify-link:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-inset);
 }
 
 @media (max-width: 768px) {
   .artist-card {
-    display: flex;
     flex-direction: row;
+    align-items: stretch;
   }
-
+  
   .artist-image-container {
-    width: 100px;
+    width: 120px;
+    margin: 10px;
     aspect-ratio: 1;
     flex-shrink: 0;
   }
 
   .artist-info {
-    flex: 1;
-    padding: 12px;
+    padding: 15px;
   }
-
-  .artist-name {
-    font-size: 15px;
-    margin-bottom: 8px;
-  }
-
-  .artist-gender {
+  
+  .artist-rank {
+    top: 10px;
+    left: 10px;
+    padding: 4px 8px;
     font-size: 12px;
-    padding: 4px 10px;
-  }
-
-  .genre-tag {
-    font-size: 10px;
-    padding: 3px 8px;
-  }
-
-  .spotify-link {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .artist-image-container {
-    width: 80px;
-  }
-
-  .artist-info {
-    padding: 10px;
-  }
-
-  .artist-name {
-    font-size: 14px;
   }
 }

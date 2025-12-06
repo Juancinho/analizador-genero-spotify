@@ -4,18 +4,19 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: var(--bg-primary);
 }
 
 .login-card {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  background: var(--bg-primary);
+  border-radius: 30px;
   max-width: 500px;
   width: 100%;
   overflow: hidden;
   animation: fadeIn 0.5s ease-out;
+  box-shadow:
+    12px 12px 24px var(--shadow-dark),
+    -12px -12px 24px var(--shadow-light);
 }
 
 @keyframes fadeIn {
@@ -30,15 +31,17 @@
 }
 
 .login-header {
-  background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+  background: linear-gradient(135deg, #1DB954 0%, #1aa34a 100%);
   padding: 50px 30px;
   text-align: center;
   color: white;
+  position: relative;
 }
 
 .logo-icon {
   margin-bottom: 15px;
   animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 @keyframes float {
@@ -54,45 +57,49 @@
   font-size: 28px;
   margin-bottom: 10px;
   font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .subtitle {
   font-size: 16px;
-  opacity: 0.9;
+  opacity: 0.95;
   font-weight: 400;
 }
 
 .login-content {
   padding: 40px 30px;
-  background: #1a1a1a;
+  background: var(--bg-primary);
 }
 
 .description {
   text-align: center;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 30px;
   font-size: 15px;
 }
 
 .error-message {
-  background-color: #2a1515;
-  border: 1px solid #ff4444;
+  background: var(--bg-secondary);
+  border: none;
   color: #ff6b6b;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 15px;
   margin-bottom: 20px;
   text-align: center;
   font-size: 14px;
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
 }
 
 .spotify-login-btn {
   width: 100%;
-  background: #1DB954;
-  color: white;
+  background: var(--bg-primary);
+  color: var(--accent-green);
   border: none;
   border-radius: 50px;
-  padding: 16px 24px;
+  padding: 18px 24px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
@@ -101,17 +108,41 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.spotify-login-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.spotify-login-btn:hover::before {
+  left: 100%;
 }
 
 .spotify-login-btn:hover {
-  background: #1ed760;
+  color: #1ed760;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
 }
 
 .spotify-login-btn:active {
   transform: translateY(0);
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
 }
 
 .spotify-icon {
@@ -125,7 +156,24 @@
   gap: 20px;
   margin-top: 40px;
   padding-top: 30px;
-  border-top: 1px solid #2a2a2a;
+  position: relative;
+}
+
+.features::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--shadow-dark) 20%,
+    var(--shadow-dark) 80%,
+    transparent
+  );
 }
 
 .feature {
@@ -134,15 +182,30 @@
   align-items: center;
   gap: 8px;
   text-align: center;
+  padding: 15px;
+  border-radius: 15px;
+  background: var(--bg-primary);
+  box-shadow:
+    4px 4px 8px var(--shadow-dark),
+    -4px -4px 8px var(--shadow-light);
+  transition: all 0.3s;
+}
+
+.feature:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
 }
 
 .feature-icon {
   font-size: 28px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .feature span:last-child {
   font-size: 13px;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -157,6 +220,10 @@
 
   .features {
     gap: 15px;
+  }
+
+  .feature {
+    padding: 12px;
   }
 
   .feature span:last-child {

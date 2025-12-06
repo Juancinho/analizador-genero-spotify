@@ -55,7 +55,7 @@ function Dashboard({ artists, onLogout }) {
         style={{
           fontSize: '24px',
           fontWeight: 'bold',
-          textShadow: '2px 2px 6px rgba(0,0,0,0.9)'
+          textShadow: '0px 2px 4px rgba(0,0,0,0.4)'
         }}
       >
         {`${(percent * 100).toFixed(0)}%`}
@@ -86,7 +86,9 @@ function Dashboard({ artists, onLogout }) {
         <div className="stats-section">
           <div className="stats-cards">
             <div className="stat-card total">
-              <Users size={24} />
+              <div className="stat-icon-wrapper">
+                <Users size={24} />
+              </div>
               <div>
                 <p className="stat-value">{stats.total}</p>
                 <p className="stat-label">Total Artistas</p>
@@ -94,7 +96,9 @@ function Dashboard({ artists, onLogout }) {
             </div>
 
             <div className="stat-card male">
-              <TrendingUp size={24} />
+              <div className="stat-icon-wrapper">
+                <TrendingUp size={24} />
+              </div>
               <div>
                 <p className="stat-value">{stats.male}</p>
                 <p className="stat-label">Masculino ({stats.malePercentage}%)</p>
@@ -102,7 +106,9 @@ function Dashboard({ artists, onLogout }) {
             </div>
 
             <div className="stat-card female">
-              <TrendingUp size={24} />
+              <div className="stat-icon-wrapper">
+                <TrendingUp size={24} />
+              </div>
               <div>
                 <p className="stat-value">{stats.female}</p>
                 <p className="stat-label">Femenino ({stats.femalePercentage}%)</p>
@@ -110,7 +116,9 @@ function Dashboard({ artists, onLogout }) {
             </div>
 
             <div className="stat-card unknown">
-              <TrendingUp size={24} />
+              <div className="stat-icon-wrapper">
+                <TrendingUp size={24} />
+              </div>
               <div>
                 <p className="stat-value">{stats.unknown}</p>
                 <p className="stat-label">Desconocido ({stats.unknownPercentage}%)</p>
@@ -123,7 +131,7 @@ function Dashboard({ artists, onLogout }) {
             <div className="chart-container">
               <h3>Distribución por Género</h3>
               <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height={500}>
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <defs>
                       <linearGradient id="maleGradient" x1="0" y1="0" x2="0" y2="1">
@@ -145,44 +153,55 @@ function Dashboard({ artists, onLogout }) {
                       cy="50%"
                       labelLine={false}
                       label={renderCustomLabel}
-                      outerRadius={180}
-                      innerRadius={90}
-                      fill="#8884d8"
+                      outerRadius="90%"
+                      innerRadius="40%"
                       dataKey="value"
                       animationBegin={0}
                       animationDuration={800}
                       animationEasing="ease-out"
-                      paddingAngle={2}
+                      paddingAngle={4}
+                      stroke="none" 
                     >
                       {chartData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={entry.gradient}
-                          stroke="#1a1a1a"
+                          stroke="#e0e5ec"
                           strokeWidth={4}
                         />
                       ))}
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#2a2a2a',
-                        border: '1px solid #3a3a3a',
-                        borderRadius: '8px',
-                        color: '#ffffff'
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(5px)',
+                        border: 'none',
+                        borderRadius: '15px',
+                        color: '#4a5568',
+                        boxShadow: '5px 5px 10px rgba(163,177,198,0.4)'
                       }}
-                      itemStyle={{ color: '#ffffff' }}
+                      itemStyle={{ color: '#4a5568' }}
+                      cursor={false}
                     />
                     <Legend
                       verticalAlign="bottom"
-                      height={40}
+                      height={36}
                       iconType="circle"
-                      iconSize={12}
+                      iconSize={10}
                       wrapperStyle={{
-                        paddingTop: '30px'
+                        paddingTop: '20px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '20px'
                       }}
                       formatter={(value, entry) => (
-                        <span style={{ color: '#b3b3b3', fontSize: '16px', fontWeight: '500' }}>
-                          {value} ({entry.payload.value} artistas)
+                        <span style={{ 
+                          color: '#718096', 
+                          fontSize: '14px', 
+                          fontWeight: '600',
+                          marginLeft: '4px'
+                        }}>
+                          {value} <span style={{ opacity: 0.7, fontSize: '12px' }}>({entry.payload.value})</span>
                         </span>
                       )}
                     />
