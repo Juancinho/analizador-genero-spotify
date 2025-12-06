@@ -164,16 +164,16 @@
   .artist-card {
     flex-direction: row;
     align-items: center;
-    min-height: 180px; /* Increased height */
+    min-height: 220px; /* Increased height */
   }
   
   .artist-image-container {
-    width: 150px; /* Increased size */
-    height: 150px;
-    margin: 10px;
+    width: 180px; /* Increased size */
+    height: 180px;
+    margin: 15px;
     aspect-ratio: 1;
     flex-shrink: 0;
-    border-radius: 18px;
+    border-radius: 20px;
   }
 
   .artist-info {
@@ -182,15 +182,15 @@
   }
   
   .artist-rank {
-    top: 8px;
-    left: 8px;
-    padding: 4px 8px;
-    font-size: 11px;
+    top: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
   }
 
   .artist-name {
-    font-size: 17px;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-bottom: 12px;
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -198,15 +198,15 @@
   }
 
   .artist-gender {
-    padding: 6px 12px;
-    font-size: 11px;
+    padding: 6px 14px;
+    font-size: 12px;
     margin-bottom: 12px;
   }
 
   .spotify-link {
-    margin-top: 5px;
-    padding: 8px 16px;
-    font-size: 12px;
+    margin-top: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
     align-self: flex-start;
   }
   
@@ -218,15 +218,15 @@
 
 @media (max-width: 480px) {
   .artist-image-container {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
   }
   
   .artist-info {
-    padding: 10px;
+    padding: 12px;
   }
 
   .artist-name {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
