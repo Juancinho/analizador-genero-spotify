@@ -1,7 +1,6 @@
 """
-Backend para Spotify Gender Analyzer.
-Aquí es donde ocurre la magia de cruzar datos de Spotify con MusicBrainz.
-He optado por FastAPI por su rapidez (async) y facilidad para manejar tipos.
+Backend del Spotify Gender Analyzer.
+Cruza los top artistas de Spotify con MusicBrainz para sacar el género.
 """
 import os
 import json
@@ -25,12 +24,14 @@ load_dotenv()
 
 app = FastAPI(title="Spotify Gender Analysis API")
 
-# IMPORTANTE: Configuración CORS
-# Permitimos todo (*) por ahora para facilitar el desarrollo local con Vite.
-# En producción, debería restringirlo al dominio real del frontend.
+ALLOWED_ORIGINS = [
+    "https://analizador-genero-spotify-frontend.vercel.app",
+    "http://localhost:5173",  # dev local
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,12 +48,10 @@ mb.set_useragent("SpotifyGenderAnalyzer", "1.0", "https://github.com/yourusernam
 
 gender_detector = Detector()
 
-# Almacenamiento simple de tokens en memoria.
-# Nota: Si escalara esto, usaría Redis, pero para un proyecto personal funciona bien.
+# tokens en memoria, suficiente para esto
 token_storage = {}
 
 def get_spotify_oauth():
-    """Helper para instanciar el flujo OAuth de Spotify."""
     return SpotifyOAuth(
         client_id=SPOTIFY_CLIENT_ID,
         client_secret=SPOTIFY_CLIENT_SECRET,
@@ -61,16 +60,14 @@ def get_spotify_oauth():
         cache_path=None
     )
 
-# --- GESTIÓN DEL DATASET PERSISTENTE ---
-# La API de MusicBrainz es lenta y tiene rate limits.
-# Para evitar esperar 50s cada vez, guardo los resultados en un JSON local.
-# Así, la segunda vez que alguien analice "Taylor Swift", la respuesta será instantánea.
+# MusicBrainz es lento y tiene rate limit, así que guardo los resultados en JSON local.
+# La segunda vez que aparezca un artista, ya lo tenemos sin esperar.
 
 DATASET_FILE = Path(__file__).parent / "artists_gender_dataset.json"
 gender_dataset = {}
 
 def load_gender_dataset():
-    """Carga nuestra 'base de conocimiento' local al iniciar."""
+    """Carga el JSON con artistas ya conocidos."""
     global gender_dataset
     try:
         if DATASET_FILE.exists():
@@ -85,7 +82,7 @@ def load_gender_dataset():
         gender_dataset = {}
 
 def save_gender_dataset():
-    """Persiste lo aprendido a disco."""
+    """Guarda el dataset a disco."""
     try:
         with open(DATASET_FILE, 'w', encoding='utf-8') as f:
             json.dump(gender_dataset, f, ensure_ascii=False, indent=2)
@@ -122,29 +119,22 @@ def get_member_gender(member_id: str) -> str:
 
 def detect_artist_gender(artist_name: str, save_to_dataset: bool = True) -> str:
     """
-    El núcleo de la lógica de detección. Sigue una estrategia de cascada (Fallback):
-    
-    1. ¿Lo conocemos ya? (Dataset local) -> Retorno inmediato.
-    2. ¿Es cache de sesión? -> Retorno inmediato.
-    3. Consulta a MusicBrainz:
-       a) ¿Es solista y tiene género definido? -> Usar eso.
-       b) ¿Es banda? -> Analizar miembros. Si hay al menos una mujer, lo marco como 'female'
-          (decisión de diseño para visibilizar presencia femenina en grupos mixtos).
-       c) ¿Falla todo? -> Inferencia por nombre (gender-guesser).
+    Detecta el género de un artista. Prueba en este orden:
+    - Dataset local (lo más rápido)
+    - Cache en memoria
+    - MusicBrainz: si es solista usa su género, si es banda mira los miembros
+    - Como último recurso, adivina por el nombre con gender-guesser
     """
     try:
-        # 1. Dataset Persistente (Lo más rápido)
         if artist_name in gender_dataset:
             print(f"✓ {artist_name}: encontrado en dataset local.")
             return gender_dataset[artist_name]
 
-        # 2. Cache en memoria
         if artist_name in gender_cache:
             return gender_cache[artist_name]
 
-        # 3. Consulta externa a MusicBrainz
         print(f"🔍 {artist_name}: consultando MusicBrainz...")
-        time.sleep(0.1) # Respetamos el rate limit de la API pública
+        time.sleep(0.1)  # rate limit
 
         result = mb.search_artists(artist=artist_name, limit=1)
 
@@ -154,13 +144,12 @@ def detect_artist_gender(artist_name: str, save_to_dataset: bool = True) -> str:
         artist_data = result["artist-list"][0]
         artist_id = artist_data["id"]
 
-        # Pedimos relaciones para ver si es banda y quiénes la componen
         info = mb.get_artist_by_id(artist_id, includes=["artist-rels"])
         artist_info = info.get("artist", {})
 
         detected_gender = "unknown"
 
-        # Caso Solista
+        # solista
         if "gender" in artist_info:
             gender = artist_info["gender"].lower()
             if gender in ["female", "woman"]:
@@ -168,7 +157,7 @@ def detect_artist_gender(artist_name: str, save_to_dataset: bool = True) -> str:
             elif gender in ["male", "man"]:
                 detected_gender = "male"
 
-        # Caso Banda (Analizar integrantes)
+        # banda
         elif artist_info.get("artist-relation-list"):
             members = artist_info.get("artist-relation-list", [])
             has_female = False
@@ -184,14 +173,13 @@ def detect_artist_gender(artist_name: str, save_to_dataset: bool = True) -> str:
                         elif m_gender == "male":
                             has_male = True
 
-            # Lógica de clasificación de bandas:
-            # Priorizamos marcar 'female' si hay presencia femenina, para destacar diversidad.
+            # si hay aunque sea una mujer en la banda, cuento como 'female'
             if has_female:
                 detected_gender = "female"
             elif has_male:
                 detected_gender = "male"
 
-        # Fallback final: Adivinar por nombre (útil para artistas nuevos/desconocidos en MB)
+        # si no hay nada, intentamos adivinar por el nombre
         else:
             first_name = artist_name.split()[0]
             gender_guess = gender_detector.get_gender(first_name)
@@ -200,7 +188,6 @@ def detect_artist_gender(artist_name: str, save_to_dataset: bool = True) -> str:
             elif gender_guess in ["male", "mostly_male"]:
                 detected_gender = "male"
 
-        # Guardamos el resultado aprendido
         gender_cache[artist_name] = detected_gender
         if save_to_dataset:
             gender_dataset[artist_name] = detected_gender
@@ -218,7 +205,7 @@ async def root():
 
 @app.get("/login")
 async def login():
-    """Inicia el baile de OAuth enviando al usuario a Spotify."""
+    """Devuelve la URL de login de Spotify."""
     sp_oauth = get_spotify_oauth()
     state = secrets.token_urlsafe(16)
     auth_url = sp_oauth.get_authorize_url(state=state)
@@ -226,10 +213,6 @@ async def login():
 
 @app.get("/callback")
 async def callback(code: str = None, error: str = None):
-    """
-    Spotify nos devuelve al usuario aquí con un código.
-    Lo canjeamos por un token real y creamos una sesión nuestra.
-    """
     if error:
         return RedirectResponse(url=f"{FRONTEND_URL}?error={error}")
 
@@ -251,13 +234,7 @@ async def callback(code: str = None, error: str = None):
 
 @app.get("/top-artists-gender")
 async def get_top_artists_gender(session_id: str, time_range: str = "short_term"):
-    """
-    Endpoint principal.
-    1. Obtiene top artistas de Spotify.
-    2. Enriquece cada artista con su género (en paralelo).
-    3. Retorna la lista ordenada.
-    """
-    # Siempre recargar por si edité el JSON a mano mientras corría el server
+    # recargo por si toqué el JSON a mano mientras corría el server
     load_gender_dataset()
 
     if session_id not in token_storage:
@@ -270,7 +247,6 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
         token_info = token_storage[session_id]
         sp = spotipy.Spotify(auth=token_info["access_token"])
 
-        # Ajuste dinámico: Top 50 para corto plazo, Top 30 para periodos largos (más representativo)
         limit = 50 if time_range == "short_term" else 30
         results = sp.current_user_top_artists(limit=limit, time_range=time_range)
 
@@ -278,7 +254,6 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
 
         def process_artist(artist):
             artist_name = artist["name"]
-            # Aquí es donde consultamos nuestra lógica de detección
             gender = detect_artist_gender(artist_name)
             return {
                 "id": artist["id"],
@@ -293,11 +268,8 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
 
         artists_with_gender = []
 
-        # Usamos ThreadPoolExecutor para hacer múltiples peticiones a la vez.
-        # Es I/O bound, así que los hilos funcionan perfecto aquí.
+        # uso futures en lista para mantener el orden del ranking de Spotify
         with ThreadPoolExecutor(max_workers=5) as executor:
-            # Clave: Mantenemos el orden de envío para que la lista final
-            # respete el ranking (1º, 2º, 3º...) de Spotify.
             futures = [executor.submit(process_artist, artist) for artist in results["items"]]
 
             for future in futures:
@@ -307,7 +279,6 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
                 except Exception as e:
                     print(f"❌ Error procesando artista: {str(e)}")
 
-        # Persistir todo lo aprendido nuevo en esta ejecución
         save_gender_dataset()
         print(f"💾 Dataset guardado/actualizado.\n")
 
@@ -317,7 +288,6 @@ async def get_top_artists_gender(session_id: str, time_range: str = "short_term"
         }
 
     except spotipy.exceptions.SpotifyException as e:
-        # Manejo básico de expiración de token
         if e.http_status == 401:
             try:
                 sp_oauth = get_spotify_oauth()

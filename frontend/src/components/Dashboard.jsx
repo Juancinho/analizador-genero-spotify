@@ -53,17 +53,14 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
     return artists.filter(artist => artist.gender === filter)
   }, [artists, filter])
 
-  // Datos para el gráfico circular con colores vibrantes
   const chartData = [
     { name: 'Masculino', value: stats.male, color: '#3B82F6', gradient: 'url(#maleGradient)' },
     { name: 'Femenino', value: stats.female, color: '#EC4899', gradient: 'url(#femaleGradient)' },
     { name: 'Desconocido', value: stats.unknown, color: '#6B7280', gradient: 'url(#unknownGradient)' }
   ].filter(item => item.value > 0)
 
-  // Label personalizado para el gráfico
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     const RADIAN = Math.PI / 180
-    // Calcular la posición del label en el centro de la porción
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5
     const x = cx + radius * Math.cos(-midAngle * RADIAN)
     const y = cy + radius * Math.sin(-midAngle * RADIAN)
@@ -72,13 +69,13 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
       <text
         x={x}
         y={y}
-        fill="white" // Color blanco para contrastar con los colores de las porciones
-        textAnchor="middle" // Centrar horizontalmente
-        dominantBaseline="central" // Centrar verticalmente
+        fill="white"
+        textAnchor="middle"
+        dominantBaseline="central"
         style={{
-          fontSize: '16px', // Tamaño de fuente legible
+          fontSize: '16px',
           fontWeight: 'bold',
-          textShadow: '0px 0px 4px rgba(0,0,0,0.6)' // Sombra para mejor legibilidad
+          textShadow: '0px 0px 4px rgba(0,0,0,0.6)'
         }}
       >
         {`${(percent * 100).toFixed(0)}%`}
@@ -135,7 +132,6 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
       </header>
 
       <div className="dashboard-content">
-        {/* Sección de estadísticas */}
         <div className="stats-section">
           <div className="stats-cards">
             <div className="stat-card total">
@@ -179,19 +175,16 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
             </div>
           </div>
 
-          {/* Mensaje gracioso */}
           <div className={`sassy-message-container ${sassyMessage.type}`}>
             <MessageCircle size={28} className="sassy-icon" />
             <p>{sassyMessage.text}</p>
           </div>
 
-          {/* Gráfico circular */}
           {chartData.length > 0 && (
             <div className="chart-section">
               <h3>Distribución por Género</h3>
               
               <div className="chart-area">
-                {/* Centro Neumórfico Flotante */}
                 <div className="chart-inner-hub">
                   <span className="hub-number">{stats.total}</span>
                   <span className="hub-label">Artistas</span>
@@ -217,7 +210,7 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                       </linearGradient>
                     </defs>
 
-                    {/* Anillo de fondo (Track / Surco Circular) */}
+                    {/* anillo de fondo */}
                     <Pie
                       data={[{ value: 1 }]}
                       cx="50%"
@@ -229,13 +222,12 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                       fill="var(--bg-primary)" 
                     />
 
-                    {/* Datos reales */}
                     <Pie
                       data={chartData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={renderCustomLabel} // Aquí reintroducimos los labels
+                      label={renderCustomLabel}
                       outerRadius="85%"
                       innerRadius="60%"
                       dataKey="value"
@@ -272,7 +264,6 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
                 </ResponsiveContainer>
               </div>
 
-              {/* Leyenda Personalizada Estática */}
               <div className="custom-legend">
                 <div className="legend-item">
                   <span className="legend-dot male"></span>
@@ -300,7 +291,6 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
           )}
         </div>
 
-        {/* Filtros */}
         <div className="filters-section">
           <div className="filters-header">
             <Filter size={20} />
@@ -334,7 +324,6 @@ function Dashboard({ artists, onLogout, timeRange, onTimeRangeChange }) {
           </div>
         </div>
 
-        {/* Lista de artistas */}
         <div className="artists-section">
           <h3>Artistas ({filteredArtists.length})</h3>
           <div className="artists-grid">
